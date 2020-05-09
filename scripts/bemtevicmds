@@ -1,0 +1,157 @@
+#create bucket
+
+gsutil mb -p bemtevisaude -c standard -l us-east1 -b on gs://bucket1-us
+
+gsutil mb -p bemtevisaude -c standard -l us-east1 -b on gs://bucket-1-felipe-us
+gsutil mb -p bemtevisaude -c standard -l europe-north1 -b on gs://bucket-2-felipe-eu
+
+#copy contents to bucket
+gsutil cp gs://gcp-external-http-lb-with-bucket/three-cats.jpg gs://bucket-1-felipe-us/static/us/
+gsutil cp gs://gcp-external-http-lb-with-bucket/two-dogs.jpg gs://bucket-2-felipe-eu/static/eu/
+
+#make the buckets public
+gsutil iam ch allUsers:objectViewer gs://bucket-1-felipe-us
+gsutil iam ch allUsers:objectViewer gs://bucket-2-felipe-eu
+
+#generate ssl certificates
+#generate key
+openssl genrsa -out bemtevi.key 2048
+#generate csr
+openssl req -new -key bemtevi.key -out bemtevi.csr
+#obtain the certificate
+openssl x509 -req -days 365 -in bemtevi.csr -signkey bemtevi.key -out bemtevi.crt
+
+#create ssl-certificate on google
+gcloud compute ssl-certificates create ssl-bemtevi-certificate --certificate bemtevi.crt --private-key bemtevi.key
+
+openssl req -out bemtevissl.csr -newkey rsa:2048 -nodes -keyout bemtevissl.key
+
+https://geekflare.com/google-managed-certificate-lb/
+
+
+gcloud compute copy-files index.html bemtevi:~/stage --zone=us-central1-a
+
+gcloud compute scp --recurse bemtevi:/index.html ~/stage
+
+gcloud compute scp ~/index.html bemtevi:~/home/bemtevisaudeintegrada/stage
+
+
+
+#RUNNING VM
+https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04
+https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-18-04
+https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-18-04
+
+
+#TUTORIAL FOR FULL INSTALLATION FOR MANY SITES
+
+#install apache
+sudo apt-get update
+sudo apt install apache2
+
+#enable ufw - firewall
+sudo ufw enable
+sudo ufw allow 'Apache'
+
+#setup bemtevi site - here is the place where to push the site
+sudo mkdir /var/www/bemtevi
+
+#create virtual host file - copy the content with to proper params
+sudo vi /etc/apache2/sites-available/bemtevisaude.com.conf
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName bemtevisaude.com
+    ServerAlias www.bemtevisaude.com
+    DocumentRoot /var/www/bemtevi
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+#enable a2ensite
+sudo a2ensite bemtevisaude.com.conf
+
+#disbale default site
+sudo a2dissite 000-default.conf
+
+#check if anything is wrong
+sudo apache2ctl configtest
+
+#restart apache
+sudo systemctl restart apache2
+
+#install certbot
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt install python-certbot-apache
+
+
+#Allow all rules
+sudo ufw allow 'Apache Full'
+
+#show status
+sudo ufw status
+
+#remove redundant rules since Full is enabled
+sudo ufw delete allow 'Apache'
+
+#Obtain certifications - look that we can choose to redirect http to https
+sudo certbot --apache -d bemtevisaude.com -d www.bemtevisaude.com
+
+
+#SUMMARY
+#install apache
+sudo apt-get update
+#need Y
+sudo apt install apache2
+
+#enable ufw - firewall
+#need Y
+sudo ufw enable
+#Add specific firewall rules
+sudo ufw allow 'Apache Full'
+#[OPTION] but if we want to transfer files from local machine we must use it
+sudo ufw allow ssh
+
+#copy the default conf (from withing a dir which contains the script-files)
+#<VirtualHost *:80>
+#    ServerName bemtevisaude.com
+#    ServerAlias www.bemtevisaude.com
+#    Redirect / https://www.bemtevisaude.com
+#    DocumentRoot /var/www/html
+#    ErrorLog ${APACHE_LOG_DIR}/error.log
+#    CustomLog ${APACHE_LOG_DIR}/access.log combined
+#</VirtualHost>
+
+gcloud compute scp 000-default.conf root@bemtevisaude:/etc/apache2/sites-available
+
+#[OPTIONAL] test the conf file
+sudo apache2ctl configtest
+
+#restart apache
+sudo systemctl restart apache2
+
+#install certbot
+#need ENTER
+sudo add-apt-repository ppa:certbot/certbot
+#need Y
+sudo apt install python-certbot-apache
+
+#[ONLY ONCE]Obtain certifications - look that we can choose to redirect http to https
+#[VALIDATE if I can keep the cert files located at /etc/letsencrypt/live/bemtevisaude.com and use for each new instance]
+sudo certbot --apache -d bemtevisaude.com -d www.bemtevisaude.com
+
+
+
+
+
+#BONUS
+#Allow ssh firewall
+gcloud compute firewall-rules create default-allow-ssh --allow tcp:22
+
+#Move site from local to apache host (make sure where you are)
+gcloud compute scp --recurse ./bemtevi root@bemtevisaude:/var/www/html
+#mv files to html(from html folder on host machine)
+mv -v ./bemtevi/* . && rm -R bemtevi
+
+gcloud compute scp --recurse ./dist/* root@bemtevi:/var/www/html
+
+

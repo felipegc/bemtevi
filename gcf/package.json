@@ -1,0 +1,15 @@
+{
+  "name": "gcf",
+  "version": "1.0.0",
+  "description": "gcloud functions deploy email --runtime nodejs8 --trigger-http --allow-unauthenticated",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "escape-html": "^1.0.3",
+    "@sendgrid/mail": "^7.0.1"
+  }
+}
