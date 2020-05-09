@@ -91,6 +91,7 @@ $(function () {
     removeFocusFromElement(sendEmailButton);
 
     elements.forEach(function(el) {
+      cleanInput(el)
       removeDisableAttr(el);
     });
   }
@@ -152,5 +153,9 @@ $(function () {
 
   function hideElement(element) {
     $(element).css('display', 'none');
+  }
+
+  function cleanInput(element) {
+    $(element).val('');
   }
 });

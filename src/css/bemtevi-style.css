@@ -662,6 +662,10 @@
     border-color: var(--main-color);
   }
 
+  .alert-default-state {
+    display:none;
+  }
+
   button.submit-button-contact {
     background: var(--main-color);
     border-color: transparent;
