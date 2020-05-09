@@ -438,8 +438,12 @@
   }
 
   /*carousel*/
-  .carousel-item {
+  /* .carousel-item {
     opacity: 0.55;
+  } */
+
+  .carousel-item h1{
+    color: var(--main-color);
   }
 
   .carousel-caption {
