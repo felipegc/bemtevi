@@ -20,3 +20,11 @@ dist/
 package-lock.json
 node_modules
 functions/keys_NEVER_COMMIT.txt
+src/js/aos.js
+src/js/bootstrap.min.js
+src/js/jquery.mask.js
+src/js/jquery.min.js
+src/js/popper.min.js
+src/css/aos.css
+src/css/bootstrap.min.css
+src/css/font-awesome.min.css
