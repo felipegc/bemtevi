@@ -27,7 +27,7 @@ exports.sendEmail = functions.https.onRequest((req, res) => {
         `
         <h1 style="font-size: 16px;">Contato</h1>
         <p>Nome: ${req.query.name}</p>
-        <p>Telefone: ${req.query.name}</p>
+        <p>Telefone: ${req.query.phone}</p>
         <p>Email: ${req.query.email}</p>
         <p>Mensagem: ${req.query.message}</p>
         `
