@@ -31,6 +31,35 @@ $(function () {
     });
   });
 
+  // FORM INPUTS
+  $('#inputName').on('focus', function () {
+    removeIsInvalidClassFromElement('inputName');
+  });
+
+  $('#inputEmail').on('focus', function () {
+    removeIsInvalidClassFromElement('inputEmail');
+  });
+
+  var maskBehavior = function (val) {
+    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+  },
+
+  options = {
+    onKeyPress: function(val, e, field, options) {
+      field.mask(maskBehavior.apply({}, arguments), options);
+    }
+  };
+
+  $('#inputPhone').mask(maskBehavior, options);
+
+  $('#inputPhone').on('focus', function () {
+    removeIsInvalidClassFromElement('inputPhone');
+  });
+
+  $('#inputMsg').on('focus', function () {
+    removeIsInvalidClassFromElement('inputMsg');
+  });
+
   // SEND EMAIL
   $('button#sendEmail').on('click', function() {
     var inputName = getElementById('inputName');
@@ -38,14 +67,39 @@ $(function () {
     var inputPhone = getElementById('inputPhone');
     var inputMsg = getElementById('inputMsg');
 
-    blockEmailForm(inputName, inputEmail, inputPhone, inputMsg);
+    if (!inputName.val()) {
+      showAlert('Erro', 'Preencha o campo Nome.', 'danger');
+      return;
+    }
 
-    // TODO: add validate if necessary
-    // if (!inputName.val()) {
-    //   inputName.addClass('is-invalid');
-    //   showAlert('Erro', 'Preencha todos os campos', 'danger');
-    //   return;
-    // }
+    if (!inputMsg.val()) {
+      showAlert('Erro', 'Preencha o campo Mensagem.', 'danger');
+      return;
+    }
+
+    var email = inputEmail.val();
+    var phone = inputPhone.val();
+
+    if (!email && !phone) {
+      showAlert('Erro', 'Preencha Email ou Telefone.', 'danger');
+      return;
+    }
+
+    var emailRegex = new RegExp(/[\w-\.]+@([\w-]+\.)+[\w-]{2,4}/g);
+    if (!phone && !emailRegex.test(email)) {
+      inputEmail.addClass('is-invalid');
+      showAlert('Erro', 'Email inválido.', 'danger');
+      return;
+    }
+
+    var phoneRegex = new RegExp(/\(\d{2}\)\s\d{4,5}\-\d{4}/g);
+    if (!email && !phoneRegex.test(phone)) {
+      inputPhone.addClass('is-invalid');
+      showAlert('Erro', 'Telefone inválido.', 'danger');
+      return;
+    }
+
+    blockEmailForm(inputName, inputEmail, inputPhone, inputMsg);
 
     var contact = {
       name: inputName.val(),
@@ -106,6 +160,11 @@ $(function () {
     setTimeout(function() {
       hideElement(alertMsg);
     }, 5000)
+  }
+
+  function removeIsInvalidClassFromElement(elementId) {
+    var element = getElementById(elementId);
+    element.removeClass('is-invalid');
   }
 
   // JQUERY ABSTRACTION

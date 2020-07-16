@@ -25,6 +25,7 @@ function js() {
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/aos/dist/aos.js',
       'node_modules/jquery/dist/jquery.min.js',
+      'node_modules/jquery-mask-plugin/dist/jquery.mask.js',
       'src/js/*.js'])
     .pipe(babel({
       presets: ['@babel/preset-env']
@@ -57,7 +58,8 @@ function jsDev() {
       'node_modules/bootstrap/dist/js/bootstrap.min.js',
       'node_modules/popper.js/dist/umd/popper.min.js',
       'node_modules/aos/dist/aos.js',
-      'node_modules/jquery/dist/jquery.min.js'])
+      'node_modules/jquery/dist/jquery.min.js',
+      'node_modules/jquery-mask-plugin/dist/jquery.mask.js'])
     .pipe(gulp.dest('src/js'))
     .pipe(browserSync.stream());
 }
